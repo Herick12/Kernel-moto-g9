@@ -14,11 +14,19 @@ jobs:
     - name: Instalar Dependências e Ferramentas
       run: |
         sudo apt-get update
-        sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu python3-2to3
+        sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu
 
     - name: Corrigir Scripts Python e Kconfigs
       run: |
-        2to3 -w scripts/gcc-wrapper.py
+        python3 -c "
+        import re
+        with open('scripts/gcc-wrapper.py', 'r') as f:
+            text = f.read()
+        text = re.sub(r'print \"error, forbidden warning:\", (.*)', r'print(\"error, forbidden warning:\", \1)', text)
+        text = re.sub(r'print line,', r'print(line, end=\"\")', text)
+        with open('scripts/gcc-wrapper.py', 'w') as f:
+            f.write(text)
+        "
         find . -name "Kconfig*" -exec sed -i 's/\r//g' {} +
         sed -i '63s/\+//g' drivers/input/touchscreen/hxchipset/Kconfig
 
