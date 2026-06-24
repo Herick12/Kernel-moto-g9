@@ -14,13 +14,13 @@ jobs:
     - name: Instalar Dependências e Ferramentas
       run: |
         sudo apt-get update
-        sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu python-is-python3
+        sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu python3-2to3
 
-    - name: Limpar Caracteres Ocultos e Corrigir Scripts
+    - name: Corrigir Scripts Python e Kconfigs
       run: |
+        2to3 -w scripts/gcc-wrapper.py
         find . -name "Kconfig*" -exec sed -i 's/\r//g' {} +
-        sed -i 's/\+//g' drivers/input/touchscreen/hxchipset/Kconfig
-        sed -i 's/print "error, forbidden warning:", m.group(2)/print("error, forbidden warning:", m.group(2))/g' scripts/gcc-wrapper.py
+        sed -i '63s/\+//g' drivers/input/touchscreen/hxchipset/Kconfig
 
     - name: Compilar o Kernel (KVM Ativo)
       run: |
@@ -34,4 +34,3 @@ jobs:
       with:
         name: Kernel-MotoG9-KVM
         path: out/arch/arm64/boot/Image.gz-dtb
-
