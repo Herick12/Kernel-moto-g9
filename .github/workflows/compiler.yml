@@ -16,17 +16,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu
 
-    - name: Corrigir Scripts Python e Kconfigs
+    - name: Corrigir Kconfigs
       run: |
-        python3 -c "
-        import re
-        with open('scripts/gcc-wrapper.py', 'r') as f:
-            text = f.read()
-        text = re.sub(r'print \"error, forbidden warning:\", (.*)', r'print(\"error, forbidden warning:\", \1)', text)
-        text = re.sub(r'print line,', r'print(line, end=\"\")', text)
-        with open('scripts/gcc-wrapper.py', 'w') as f:
-            f.write(text)
-        "
         find . -name "Kconfig*" -exec sed -i 's/\r//g' {} +
         sed -i '63s/\+//g' drivers/input/touchscreen/hxchipset/Kconfig
 
@@ -34,6 +25,8 @@ jobs:
       run: |
         export ARCH=arm64
         export CROSS_COMPILE=aarch64-linux-gnu-
+        export KCFLAGS="-w"
+        sed -i 's/CC\t\t:= $(srctree)\/scripts\/gcc-wrapper.py $(REAL_CC)/CC\t\t:= $(REAL_CC)/g' Makefile
         make O=out vendor/guamp_defconfig
         make -j$(nproc) O=out
 
