@@ -16,17 +16,17 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu
 
-    - name: Corrigir Kconfigs
+    - name: Corrigir Kconfigs e Scripts
       run: |
         find . -name "Kconfig*" -exec sed -i 's/\r//g' {} +
         sed -i '63s/\+//g' drivers/input/touchscreen/hxchipset/Kconfig
+        echo -e '#!/usr/bin/env python3\nimport sys, subprocess\nsys.exit(subprocess.call(sys.argv[1:]))' > scripts/gcc-wrapper.py
 
     - name: Compilar o Kernel (KVM Ativo)
       run: |
         export ARCH=arm64
         export CROSS_COMPILE=aarch64-linux-gnu-
         export KCFLAGS="-w"
-        sed -i 's/CC\t\t:= $(srctree)\/scripts\/gcc-wrapper.py $(REAL_CC)/CC\t\t:= $(REAL_CC)/g' Makefile
         make O=out vendor/guamp_defconfig
         make -j$(nproc) O=out
 
