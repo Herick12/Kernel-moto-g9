@@ -25,6 +25,7 @@ jobs:
         sed -i '1s/^/#define prefer_spread_on_idle(cpu, ...) prefer_spread_on_idle(cpu)\n/' kernel/sched/fair.c
         sed -i '1s/^/int alarm_debug = 0;\n/' kernel/time/alarmtimer.c
         sed -i 's/techpack\///g' Makefile
+        sed -i '1s/^/void rtc_time64_to_tm(long long t, void *tm) {}\n/' kernel/power/suspend.c
 
     - name: Compilar o Kernel (KVM Ativo)
       run: |
