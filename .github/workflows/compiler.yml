@@ -14,11 +14,13 @@ jobs:
     - name: Instalar Dependências e Ferramentas
       run: |
         sudo apt-get update
-        sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu
+        sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu python-is-python3
 
-    - name: Limpar Caracteres Ocultos nos Kconfigs
+    - name: Limpar Caracteres Ocultos e Corrigir Scripts
       run: |
         find . -name "Kconfig*" -exec sed -i 's/\r//g' {} +
+        sed -i 's/\+//g' drivers/input/touchscreen/hxchipset/Kconfig
+        sed -i 's/print "error, forbidden warning:", m.group(2)/print("error, forbidden warning:", m.group(2))/g' scripts/gcc-wrapper.py
 
     - name: Compilar o Kernel (KVM Ativo)
       run: |
