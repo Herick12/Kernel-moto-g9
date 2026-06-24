@@ -23,6 +23,7 @@ jobs:
         echo -e '#!/usr/bin/env python3\nimport sys, subprocess\nsys.exit(subprocess.call(sys.argv[1:]))' > scripts/gcc-wrapper.py
         sed -i '1s/^/#define NOHZ_KICK_MASK 0\ninline int nohz_flags(int cpu){return 0;}\n/' kernel/sched/core.c
         sed -i '1s/^/#define prefer_spread_on_idle(cpu, ...) prefer_spread_on_idle(cpu)\n/' kernel/sched/fair.c
+        sed -i '1s/^/int alarm_debug = 0;\n/' kernel/time/alarmtimer.c
 
     - name: Compilar o Kernel (KVM Ativo)
       run: |
