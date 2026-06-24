@@ -1,0 +1,34 @@
+name: Build Kernel Moto G9
+
+on:
+  workflow_dispatch: # Permite que você clique num botão para iniciar a compilação manualmente
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do Kernel
+      uses: actions/checkout@v4
+
+    - name: Instalar Dependências e Ferramentas
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc build-essential libelf-dev libssl-dev bison flex python3 u-boot-tools libncurses5-dev gcc-aarch64-linux-gnu
+
+    - name: Compilar o Kernel (KVM Ativo)
+      run: |
+        export ARCH=arm64
+        export CROSS_COMPILE=aarch64-linux-gnu-
+        
+        # Gera o arquivo .config baseado no seu guamp_defconfig
+        make O=out vendor/guamp_defconfig
+        
+        # Compila de fato gerando a imagem
+        make -j$(nproc) O=out
+
+    - name: Upload da Imagem do Kernel (Image.gz)
+      uses: actions/upload-artifact@v4
+      with:
+        name: Kernel-MotoG9-KVM
+        path: out/arch/arm64/boot/Image.gz-dtb
