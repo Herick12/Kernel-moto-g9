@@ -26,12 +26,12 @@ jobs:
       run: |
         export ARCH=arm64
         export CROSS_COMPILE=aarch64-linux-gnu-
-        export KCFLAGS="-w"
         make O=out vendor/guamp_defconfig
-        make -j$(nproc) O=out
+        make O=out
 
     - name: Upload da Imagem do Kernel (Image.gz)
       uses: actions/upload-artifact@v4
       with:
         name: Kernel-MotoG9-KVM
         path: out/arch/arm64/boot/Image.gz-dtb
+
